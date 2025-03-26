@@ -15,7 +15,7 @@ describe('Minehut Storyteller Worker', () => {
 		const response = await worker.fetch(request, env, ctx).then(res => res.json()) as IdeaGenResponse;
 		// Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
 		await waitOnExecutionContext(ctx);
-        const data = replaceStory(response.replacements, [response.sentence]);
+        const data = await replaceStory(request, response.replacements, [response.sentence]);
         expect(data.response).toMatchInlineSnapshot(`"${data.response}"`);
 	});
 });

@@ -7,7 +7,7 @@ export default {
     async fetch(request, env, ctx): Promise<Response> {
         const { combinations, sentences } = await fetch(endpoint).then(res => res.json()) as IdeaGen;
 
-        const data = replaceStory(combinations, sentences);
+        const data = await replaceStory(request, combinations, sentences);
 
         return new Response(JSON.stringify(data), {
             headers: { 'Content-Type': 'application/json' },

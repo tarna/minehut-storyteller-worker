@@ -1,6 +1,7 @@
+import { getRandomServer } from './servers';
 import { IdeaGenResponse } from './types';
 
-export function replaceStory(combinations: Record<string, string[]>, sentences: string[]): IdeaGenResponse {
+export async function replaceStory(request: Request, combinations: Record<string, string[]>, sentences: string[]): Promise<IdeaGenResponse> {
     const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
     let replacedSentence = randomSentence;
     const matches = replacedSentence.match(/\[(.*?)\]/g) || [];
@@ -8,8 +9,19 @@ export function replaceStory(combinations: Record<string, string[]>, sentences: 
 
     for (const match of matches) {
         const combination = match.slice(1, -1);
-        const words = combinations[combination];
-        const randomReplacement = words[Math.floor(Math.random() * words.length)];
+
+        let randomReplacement: string;
+
+        if (combination === 'server') {
+            const random = new URL(request.url).searchParams.get('random_server') === 'true';
+            randomReplacement = await getRandomServer(!random);
+        } else {
+            const words = combinations[combination];
+            if (!words) continue;
+
+            randomReplacement = words[Math.floor(Math.random() * words.length)];
+        }
+
         replacedSentence = replacedSentence.replace(match, randomReplacement);
 
         if (!replacements[combination]) {
